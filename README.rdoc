@@ -1,0 +1,9 @@
+= redmine_im_link
+
+Summary
+
+Adds a link after a watcher name to directly call skype or slack or ms teams etc. Please note - this is my first attempt so if you see anything wrong or incorrect or there's a better way to do things, let me know, or feel free to improve it!
+
+
+
+

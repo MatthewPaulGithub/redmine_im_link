@@ -1,0 +1,92 @@
+<% string_fields = UserCustomField.all %>
+<% select_options = '<option value=""></option>' << options_from_collection_for_select(string_fields, :id, :name, @settings['linkcf'].to_i) %>
+<% select_options2 = '<option value=""></option>' << options_from_collection_for_select(string_fields, :id, :name, @settings['linkcf2'].to_i) %>
+
+
+<fieldset>
+<legend><%= l(:im_settings_legend1) %></legend>
+
+<p>
+<label><%= l(:im_enable_autowatch) %></label>
+<%= check_box_tag 'settings[addwatchers]', true, @settings['addwatchers'] %>
+<em><%= l(:im_enable_autowatch_desc) %></em>
+</p>
+
+<p>
+<label><%= l(:im_enable_people) %></label>
+<%= check_box_tag 'settings[showpeople]', true, @settings['showpeople'] %>
+<em><%= l(:im_enable_people_desc) %></em>
+
+<p><label><%= l(:im_footer_html) %></label>
+<%= text_area_tag 'settings[footerhtml]', @settings['footerhtml'] %><br />
+<em><%= l(:im_footer_html_desc) %></em><br />
+</p>
+
+</fieldset>
+
+
+<fieldset>
+<legend><%= l(:im_settings_legend2) %></legend>
+
+<p><label><%= l(:im_link_name) %></label>
+<%= text_field_tag 'settings[linkname]', @settings['linkname'] %>
+<em><%= l(:im_link_name_desc) %></em><br />
+</p>
+
+<p><label><%= l(:im_link_url) %></label>
+<%= text_field_tag 'settings[linkurl]', @settings['linkurl'] %>
+<em><%= l(:im_link_url_desc) %></em><br />
+</p>
+
+<p><label><%= l(:im_include) %></label>
+<%= text_field_tag 'settings[includestring]', @settings['includestring'] %>
+<em><%= l(:im_include_desc) %></em><br />
+</p>
+
+<p><label><%= l(:im_exclude) %></label>
+<%= text_field_tag 'settings[excludestring]', @settings['excludestring'] %>
+<em><%= l(:im_exclude_desc) %></em><br />
+</p>
+
+<p><label><%= l(:im_link_cf) %></label>
+<%= select_tag 'settings[linkcf]', select_options.html_safe %>
+<em><%= l(:im_link_cf_desc) %></em><br />
+</p>
+
+</fieldset>
+
+
+
+
+
+<fieldset>
+<legend><%= l(:im_settings_legend3) %></legend>
+
+<p><label><%= l(:im_link_name) %></label>
+<%= text_field_tag 'settings[linkname2]', @settings['linkname2'] %>
+<em><%= l(:im_link_name_desc) %></em><br />
+</p>
+
+<p><label><%= l(:im_link_url) %></label>
+<%= text_field_tag 'settings[linkurl2]', @settings['linkurl2'] %>
+<em><%= l(:im_link_url_desc) %></em><br />
+</p>
+
+<p><label><%= l(:im_include) %></label>
+<%= text_field_tag 'settings[includestring2]', @settings['includestring2'] %>
+<em><%= l(:im_include_desc) %></em><br />
+</p>
+
+<p><label><%= l(:im_exclude) %></label>
+<%= text_field_tag 'settings[excludestring2]', @settings['excludestring2'] %>
+<em><%= l(:im_exclude_desc) %></em><br />
+</p>
+
+<p><label><%= l(:im_link_cf) %></label>
+<%= select_tag 'settings[linkcf2]', select_options2.html_safe %>
+<em><%= l(:im_link_cf_desc) %></em><br />
+</p>
+
+</fieldset>
+
+<%= l(:im_settings_footer) %>

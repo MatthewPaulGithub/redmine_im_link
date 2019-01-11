@@ -1,0 +1,36 @@
+# English strings go here for Rails i18n
+en:
+
+  im_settings_legend1: 'General Settings'
+  im_settings_legend2: 'Watcher Link 1'
+  im_settings_legend3: 'Watcher Link 2'
+  
+  im_enable_autowatch: 'Enable Autowatch'
+  im_enable_autowatch_desc: 'Enables the automatic addition of Authors, Assignees, and Updating users as Watchers'
+
+  im_enable_people: 'Enable Author/Assignee section'
+  im_enable_people_desc: 'Shows the Author and Assignee underneath the Watchers section (alt to using Autowatch)'
+  
+  im_footer_html: 'HTML for footer (optional)'
+  im_footer_html_desc: 'If populated, will add any HTML including links etc at the end of the watchers list, and after the Author/Assignee section also, if you are using that'
+
+  im_link_name: 'Link Name'
+  im_link_name_desc: 'IM Name, e.g. Skype (Blank Disables)'
+  
+  im_link_cf: 'User Custom Field (optional)'
+  im_link_cf_desc: 'If selected will look for a value here first and enable use of %cf%'
+
+  im_link_url: 'Link URL'
+  im_link_url_desc: 'IM URI format, e.g. sip:%email% (%email% will be replaced)'
+  
+  im_include: 'Include Strings (Comma Separated)'
+  im_include_desc: 'Include domains/emails, e.g. yourdomain.com,vendor.com'
+
+  im_exclude: 'Exclude Strings (Comma Separated)'
+  im_exclude_desc: 'Exclude emails, e.g. support@yourdomain.com,info@vendor.com'
+  
+  im_settings_footer: 'You can use any of the following in the URL - %email%, %firstname%, %lastname%, %username%, %firstinitial%. You can also use any URI that you like including Skype for Business - sip:, Slack - slack:, General Instant Message - im:, Email client - mailto:, and so on. The include and exclude strings work together to look for patterns - so normally you would list all the domains you want to include, for example your own company domain, and the domain of any associated companies that use the tracker (e.g. support staff). The exclude strings are normally used to exclude specific email addresses which you do NOT want to include - so for example, if you have generic email addresses that are not actually owned by people.'
+  
+  im_author: '(Au)'
+  im_assignee: '(As)'
+  im_people: 'Author/Assignee'
