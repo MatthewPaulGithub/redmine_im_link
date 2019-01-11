@@ -1,10 +1,10 @@
 = redmine_im_link
 
-Summary
+== Summary
 
 Adds a link after a watcher name to directly call skype or slack or ms teams etc. Please note - this is my first attempt so if you see anything wrong or incorrect or there's a better way to do things, let me know, or feel free to improve it!
 
-Features
+== Features
 
 * Adds Autowatch functionality to issues so that Author, Assignee, Current User are all added as watchers (if feature turned on)
 
@@ -24,9 +24,11 @@ Features
 
 * Ability to set permissions so certain users can see links, others cannot
 
-Getting the Plugin
+== Getting the Plugin
 
 Always here at Github
+
+== Installation
 
 # Follow the Redmine plugin installation steps at: www.redmine.org/wiki/redmine/Plugins Make sure the plugin is installed to vendor/plugins/redmine_im_link
 
@@ -36,11 +38,6 @@ Always here at Github
 
 # Setup the links in the plugins section
 
-Usage
+== Usage
 
 Users will see links dynamically created after each watcher - they can click these to open the natice skype, slack, etc apps
-
-
-
-
-
