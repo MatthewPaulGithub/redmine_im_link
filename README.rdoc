@@ -41,3 +41,14 @@ Always here at Github
 == Usage
 
 Users will see links dynamically created after each watcher - they can click these to open the natice skype, slack, etc apps
+
+== Acknowledgments
+
+This is my first plugin and I really struggled with Ruby etc. so please a) forgive any bad coding or ignorance of how Ruby, or Javascript, or Github, or anything else works. All new to me. Having said that I completely ripped the autowatch code from a redmine plugin which I thought was awesome. I needed that because my idea was most simply implemented by adding the links after each watcher, and to do that the easiest way was to make sure that everyone involved on an issue was a watcher - hence so I took the code from the original plugin by mezza and I think thorin or maybe mephi-ut. Not sure which but I was a bit confused - hope this was alright and I hope this ack is also sufficient -
+
+https://github.com/mezza/redmine_auto_watch
+
+https://github.com/thorin/redmine_auto_watch
+
+https://github.com/mephi-ut/redmine_auto_watch
+
