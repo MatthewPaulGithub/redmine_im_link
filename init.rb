@@ -32,5 +32,6 @@
   :partial => 'redmine_im_link/settings'
   
   permission :view_im_links, :redmine_im_link => :view_im_links
+  permission :view_im_link_footer, :redmine_im_link => :view_im_link_footer
   
 end
