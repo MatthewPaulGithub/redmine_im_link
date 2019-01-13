@@ -21,11 +21,13 @@
   :linkname => 'Skype',
   :linkcf => '',
   :linkurl => 'sip:%email%',
+  :linktype => '1',
   :includestring => 'domain1.com',
   :excludestring => 'email1@domain2.com',
   :linkname2 => 'Slack',
   :linkcf2 => '',
   :linkurl2 => 'slack://open',
+  :linktype2 => '1',
   :includestring2 => 'mpaul@cityassets.com',
   :excludestring2 => 'Include All'
   }, 
