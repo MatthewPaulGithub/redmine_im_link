@@ -38,6 +38,16 @@
 <em><%= l(:im_link_url_desc) %></em><br />
 </p>
 
+<p>
+<label><%=l(:im_link_type)%></label>
+<select name="settings[linktype]">
+	<option value="1" <%= settings['linktype'] == '1' ? "selected" : "" %>><%= l(:im_link_type1) %></option>
+	<option value="2" <%= settings['linktype'] == '2' ? "selected" : "" %>><%= l(:im_link_type2) %></option>
+	<option value="3" <%= settings['linktype'] == '3' ? "selected" : "" %>><%= l(:im_link_type3) %></option>
+</select>
+<em><%= l(:im_link_type_desc) %></em><br />
+</p>
+
 <p><label><%= l(:im_include) %></label>
 <%= text_field_tag 'settings[includestring]', @settings['includestring'] %>
 <em><%= l(:im_include_desc) %></em><br />
@@ -70,6 +80,16 @@
 <p><label><%= l(:im_link_url) %></label>
 <%= text_field_tag 'settings[linkurl2]', @settings['linkurl2'] %>
 <em><%= l(:im_link_url_desc) %></em><br />
+</p>
+
+<p>
+<label><%=l(:im_link_type)%></label>
+<select name="settings[linktype2]">
+	<option value="1" <%= settings['linktype2'] == '1' ? "selected" : "" %>><%= l(:im_link_type1) %></option>
+	<option value="2" <%= settings['linktype2'] == '2' ? "selected" : "" %>><%= l(:im_link_type2) %></option>
+	<option value="3" <%= settings['linktype2'] == '3' ? "selected" : "" %>><%= l(:im_link_type3) %></option>
+</select>
+<em><%= l(:im_link_type_desc) %></em><br />
 </p>
 
 <p><label><%= l(:im_include) %></label>
