@@ -53,7 +53,15 @@ module RedmineImLinkWatchersPatch
 					linkurl1 = build_im_link(user,'linkname','linkurl','includestring','excludestring','linkcf')
 					if !linkurl1.nil? 
 						s << ' '
-						s << link_to(linkname1,linkurl1)
+						p_type = Setting.plugin_redmine_im_link['linktype'].to_s
+						case p_type
+						when '2'
+							s << link_to(linkname1,linkurl1,:target => "_blank")
+						when '3'
+							s << ('<a href="javascript:void(0)" onclick="OpenPopup(' + "'" + linkurl1 +"',1100,600)" + '">' + linkname1 + '</a>').html_safe
+						else
+							s << link_to(linkname1,linkurl1)
+						end
 					end
 					s
 				end
@@ -63,7 +71,15 @@ module RedmineImLinkWatchersPatch
 					linkurl2 = build_im_link(user,'linkname2','linkurl2','includestring2','excludestring2','linkcf2')
 					if !linkurl2.nil? 
 						s << ' '
-						s << link_to(linkname2,linkurl2)
+						p_type = Setting.plugin_redmine_im_link['linktype2'].to_s
+						case p_type
+						when '2'
+							s << link_to(linkname2,linkurl2,:target => "_blank")
+						when '3'
+							s << ('<a href="javascript:void(0)" onclick="OpenPopup(' + "'" + linkurl2 +"',1100,600)" + '">' + linkname2 + '</a>').html_safe
+						else
+							s << link_to(linkname2,linkurl2)
+						end
 					end
 					s
 				end
