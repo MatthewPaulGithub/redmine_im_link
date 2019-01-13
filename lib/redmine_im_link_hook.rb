@@ -55,7 +55,7 @@ class IncludeJavascriptsHook < Redmine::Hook::ViewListener
     include ActionView::Helpers::TagHelper
 
     def view_layouts_base_html_head(context)
-      javascript_include_tag(:application, :plugin => 'redmine_im_link')
+      javascript_include_tag(:redmine_im_link, :plugin => 'redmine_im_link')
     end
 end
 

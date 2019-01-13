@@ -32,7 +32,7 @@ module RedmineImLinkWatchersPatch
 					cftext = cftextfield.value if !cftextfield.nil?
 					if (cftext == '') and (p_url.include? '%cf%') 
 						return nil
-					elsif (cftext != '') and (p_url == '')
+					elsif (cftext != '') and ((p_url == '') or (!p_url.include? '%cf%'))
 						return cftext
 					else
 						inc = p_inc.split(/[,\s]+/)
