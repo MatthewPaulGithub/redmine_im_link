@@ -18,6 +18,7 @@
   :addwatchers => true,
   :showpeople => false,
   :footerhtml => '',
+  :popupwindowsize => '1100,600',
   :linkname => 'Skype',
   :linkcf => '',
   :linkurl => 'sip:%email%',
