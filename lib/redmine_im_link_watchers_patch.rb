@@ -90,7 +90,8 @@ module RedmineImLinkWatchersPatch
 					s
 				end
 
-				alias_method_chain :watchers_list, :im_link
+				# alias_method_chain :watchers_list, :im_link   -- was this for 3
+				alias_method :watchers_list, :watchers_list_with_im_link
 				
 			end
 		end
