@@ -6,17 +6,19 @@ module RedmineImLinkWatchersPatch
 			base.class_eval do
 				unloadable
 				
-				def dostring(user,cf,p1)
+				def dostring(user,issue,cf,p1)
 					p1 = p1.gsub('%email%',user.mail)
 					p1 = p1.gsub('%firstname%',user.firstname)
 					p1 = p1.gsub('%lastname%',user.lastname)
 					p1 = p1.gsub('%username%',user.login)
 					p1 = p1.gsub('%firstinitial%',user.firstname.chr)
+					p1 = p1.gsub('%subject%',issue.subject)
+					p1 = p1.gsub('%id%',issue.id.to_s)
 					p1 = p1.gsub('%cf%',cf)
 					return p1
 				end
 				
-				def build_im_link(user,p1,p2,p3,p4,p5)
+				def build_im_link(user,issue,p1,p2,p3,p4,p5)
 					p_name = Setting.plugin_redmine_im_link[p1].to_s
 					p_url = Setting.plugin_redmine_im_link[p2].to_s
 					p_inc = Setting.plugin_redmine_im_link[p3].to_s
@@ -42,15 +44,15 @@ module RedmineImLinkWatchersPatch
 						foundexc = exc.any?{|s| user.mail.downcase.include?(s.downcase)}
 
 						if (foundinc and not foundexc) or (p_url.include? '%cf%')
-							retstring = dostring(user,cftext,p_url)
+							retstring = dostring(user,issue,cftext,p_url)
 						end
 					end
 					retstring
 				end
 				
-				def buildlink1(user,s)
+				def buildlink1(user,issue,s)
 					linkname1 = Setting.plugin_redmine_im_link['linkname']
-					linkurl1 = build_im_link(user,'linkname','linkurl','includestring','excludestring','linkcf')
+					linkurl1 = build_im_link(user,issue,'linkname','linkurl','includestring','excludestring','linkcf')
 					if !linkurl1.nil? 
 						s << ' '
 						p_type = Setting.plugin_redmine_im_link['linktype'].to_s
@@ -58,7 +60,9 @@ module RedmineImLinkWatchersPatch
 						when '2'
 							s << link_to(linkname1,linkurl1,:target => "_blank")
 						when '3'
-							s << ('<a href="javascript:void(0)" onclick="OpenPopup(' + "'" + linkurl1 +"',1100,600)" + '">' + linkname1 + '</a>').html_safe
+							popupwindowsize = Setting.plugin_redmine_im_link['popupwindowsize'].to_s
+							popupwindowsize = '1100,600' unless popupwindowsize.include? ','
+							s << ('<a href="javascript:void(0)" onclick="OpenPopup(' + "'" + linkurl1 +"'," + popupwindowsize + ")" + '">' + linkname1 + '</a>').html_safe
 						else
 							s << link_to(linkname1,linkurl1)
 						end
@@ -66,9 +70,9 @@ module RedmineImLinkWatchersPatch
 					s
 				end
 
-				def buildlink2(user,s)
+				def buildlink2(user,issue,s)
 					linkname2 = Setting.plugin_redmine_im_link['linkname2']
-					linkurl2 = build_im_link(user,'linkname2','linkurl2','includestring2','excludestring2','linkcf2')
+					linkurl2 = build_im_link(user,issue,'linkname2','linkurl2','includestring2','excludestring2','linkcf2')
 					if !linkurl2.nil? 
 						s << ' '
 						p_type = Setting.plugin_redmine_im_link['linktype2'].to_s
@@ -76,7 +80,9 @@ module RedmineImLinkWatchersPatch
 						when '2'
 							s << link_to(linkname2,linkurl2,:target => "_blank")
 						when '3'
-							s << ('<a href="javascript:void(0)" onclick="OpenPopup(' + "'" + linkurl2 +"',1100,600)" + '">' + linkname2 + '</a>').html_safe
+							popupwindowsize = Setting.plugin_redmine_im_link['popupwindowsize'].to_s
+							popupwindowsize = '1100,600' unless popupwindowsize.include? ','
+							s << ('<a href="javascript:void(0)" onclick="OpenPopup(' + "'" + linkurl2 +"'," + popupwindowsize + ")" + '">' + linkname2 + '</a>').html_safe
 						else
 							s << link_to(linkname2,linkurl2)
 						end
@@ -115,8 +121,8 @@ module RedmineImLinkWatchersPatch
 
 	
 				if User.current.allowed_to?(:view_im_links, @project, :global => true)
-					s = buildlink1(user,s)
-					s = buildlink2(user,s)
+					s = buildlink1(user,object,s)
+					s = buildlink2(user,object,s)
 				end
 
 				content << content_tag('li', s, :class => "user-#{user.id}")
@@ -132,8 +138,8 @@ module RedmineImLinkWatchersPatch
 				content << ' '
 				content << image_tag('author.png', :plugin => 'redmine_im_link')
 				if User.current.allowed_to?(:view_im_links, @project, :global => true)
-					content = buildlink1(object.author,content)
-					content = buildlink2(object.author,content)
+					content = buildlink1(object.author,object,content)
+					content = buildlink2(object.author,object,content)
 				end
 			
 				# assignee
@@ -144,8 +150,8 @@ module RedmineImLinkWatchersPatch
 					content << ' '
 					content << image_tag('assignee.png', :plugin => 'redmine_im_link')
 					if User.current.allowed_to?(:view_im_links, @project, :global => true)
-						content = buildlink1(object.assigned_to,content)
-						content = buildlink2(object.assigned_to,content)
+						content = buildlink1(object.assigned_to,object,content)
+						content = buildlink2(object.assigned_to,object,content)
 					end
 				end
 			end
@@ -154,7 +160,7 @@ module RedmineImLinkWatchersPatch
 			if User.current.allowed_to?(:view_im_link_footer, @project, :global => true)
 				footerhtml = Setting.plugin_redmine_im_link['footerhtml'].to_s
 				if !footerhtml.nil?
-					footer = dostring(User.current,'',footerhtml)
+					footer = dostring(User.current,object,'',footerhtml)
 					content << ('<br>' + footer).html_safe
 				end
 			end
