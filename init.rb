@@ -8,7 +8,7 @@
   name 'Redmine Im Link'
   author 'Matthew Paul'
   description 'Adds link per watcher to call skype/slack/msteams'
-  version '1.0.1'
+  version '1.0.2'
   url 'https://github.com/MatthewPaulGithub/redmine_im_link'
   author_url 'https://github.com/MatthewPaulGithub'
 
