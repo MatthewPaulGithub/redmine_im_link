@@ -107,17 +107,25 @@ module RedmineImLinkWatchersPatch
 				s << avatar(user, :size => "16").to_s
 				s << link_to_user(user, :class => 'user')
 
+				# add in rm version for correct display of delete button
 				if remove_allowed
+					s << ' '
 					url = {:controller => 'watchers',
 					   :action => 'destroy',
 					   :object_type => object.class.to_s.underscore,
 					   :object_id => object.id,
 					   :user_id => user}
-					s << ' '
-					s << link_to(l(:button_delete), url,
+					rmv = (Redmine::VERSION::MAJOR).to_s + '.' + (Redmine::VERSION::MINOR).to_s
+					case rmv
+					when ('0.0'..'3.3')
+						s << link_to(image_tag('delete.png'), url,
+						:remote => true, :method => 'delete', :class => "delete")
+					else
+						s << link_to(l(:button_delete), url,
 						:remote => true, :method => 'delete',
 						:class => "delete icon-only icon-del",
 						:title => l(:button_delete))
+					end
 				end
 
 	
