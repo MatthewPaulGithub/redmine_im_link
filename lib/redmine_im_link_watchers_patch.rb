@@ -168,7 +168,7 @@ module RedmineImLinkWatchersPatch
 			#footer
 			if User.current.allowed_to?(:view_im_link_footer, @project, :global => true)
 				footerhtml = Setting.plugin_redmine_im_link['footerhtml'].to_s
-				if !footerhtml.nil?
+				if !footerhtml.blank?
 					footer = dostring(User.current,object,'',footerhtml)
 					content << ('<br>' + footer).html_safe
 				end
