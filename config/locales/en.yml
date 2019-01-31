@@ -24,10 +24,11 @@ en:
   im_link_url_desc: 'IM URI format, e.g. sip:%email% (%email% will be replaced)'
   
   im_link_type: 'Link Type'
-  im_link_type_desc: 'Open link in same, new, or popup window'
+  im_link_type_desc: 'Open link in same, new, popup, or popup/close window'
   im_link_type1: 'Default Link'
   im_link_type2: 'New Window/Tab'
   im_link_type3: 'Popup Window'
+  im_link_type4: 'Popup/Close Window'
   
   im_include: 'Include Strings (Comma Separated)'
   im_include_desc: 'Include domains/emails, e.g. yourdomain.com,vendor.com - use @ for ALL'
