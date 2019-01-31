@@ -63,6 +63,9 @@ module RedmineImLinkWatchersPatch
 							popupwindowsize = Setting.plugin_redmine_im_link['popupwindowsize'].to_s
 							popupwindowsize = '1100,600' unless popupwindowsize.include? ','
 							s << ('<a href="javascript:void(0)" onclick="OpenPopup(' + "'" + linkurl1 +"'," + popupwindowsize + ")" + '">' + linkname1 + '</a>').html_safe
+						when '4'
+							popupwindowsize = '100,100'
+							s << ('<a href="javascript:void(0)" onclick="OpenPopClose(' + "'" + linkurl1 +"'," + popupwindowsize + ")" + '">' + linkname1 + '</a>').html_safe
 						else
 							s << link_to(linkname1,linkurl1)
 						end
@@ -82,7 +85,10 @@ module RedmineImLinkWatchersPatch
 						when '3'
 							popupwindowsize = Setting.plugin_redmine_im_link['popupwindowsize'].to_s
 							popupwindowsize = '1100,600' unless popupwindowsize.include? ','
-							s << ('<a href="javascript:void(0)" onclick="OpenPopup(' + "'" + linkurl2 +"'," + popupwindowsize + ")" + '">' + linkname2 + '</a>').html_safe
+							s << ('<a href="javascript:void(0)" onclick="OpenPopup(' + "'" + linkurl2 + "'," + popupwindowsize + ")" + '">' + linkname2 + '</a>').html_safe
+						when '4'
+							popupwindowsize = '1100,600'
+							s << ('<a href="javascript:void(0)" onclick="OpenPopClose(' + "'" + linkurl2 + "'," + popupwindowsize + ")" + '">' + linkname2 + '</a>').html_safe
 						else
 							s << link_to(linkname2,linkurl2)
 						end
