@@ -3,8 +3,11 @@
 <% select_options2 = '<option value=""></option>' << options_from_collection_for_select(string_fields, :id, :name, @settings['linkcf2'].to_i) %>
 
 
+
 <fieldset>
 <legend><%= l(:im_settings_legend1) %></legend>
+
+<button type="button" onclick="setfields('default1')">Defaults</button>
 
 <p>
 <label><%= l(:im_enable_autowatch) %></label>
@@ -33,6 +36,11 @@
 <fieldset>
 <legend><%= l(:im_settings_legend2) %></legend>
 
+<button type="button" onclick="setfields('skype1')">Skype</button>
+<button type="button" onclick="setfields('teams1')">MSTeams</button>
+<button type="button" onclick="setfields('slack1')">Slack</button>
+<button type="button" onclick="setfields('email1')">Email</button>
+
 <p><label><%= l(:im_link_name) %></label>
 <%= text_field_tag 'settings[linkname]', @settings['linkname'] %>
 <em><%= l(:im_link_name_desc) %></em><br />
@@ -49,7 +57,6 @@
 	<option value="1" <%= settings['linktype'] == '1' ? "selected" : "" %>><%= l(:im_link_type1) %></option>
 	<option value="2" <%= settings['linktype'] == '2' ? "selected" : "" %>><%= l(:im_link_type2) %></option>
 	<option value="3" <%= settings['linktype'] == '3' ? "selected" : "" %>><%= l(:im_link_type3) %></option>
-	<option value="4" <%= settings['linktype'] == '4' ? "selected" : "" %>><%= l(:im_link_type4) %></option>
 </select>
 <em><%= l(:im_link_type_desc) %></em><br />
 </p>
@@ -78,6 +85,11 @@
 <fieldset>
 <legend><%= l(:im_settings_legend3) %></legend>
 
+<button type="button" onclick="setfields('skype2')">Skype</button>
+<button type="button" onclick="setfields('teams2')">MSTeams</button>
+<button type="button" onclick="setfields('slack2')">Slack</button>
+<button type="button" onclick="setfields('email2')">Email</button>
+
 <p><label><%= l(:im_link_name) %></label>
 <%= text_field_tag 'settings[linkname2]', @settings['linkname2'] %>
 <em><%= l(:im_link_name_desc) %></em><br />
@@ -94,7 +106,6 @@
 	<option value="1" <%= settings['linktype2'] == '1' ? "selected" : "" %>><%= l(:im_link_type1) %></option>
 	<option value="2" <%= settings['linktype2'] == '2' ? "selected" : "" %>><%= l(:im_link_type2) %></option>
 	<option value="3" <%= settings['linktype2'] == '3' ? "selected" : "" %>><%= l(:im_link_type3) %></option>
-	<option value="4" <%= settings['linktype2'] == '4' ? "selected" : "" %>><%= l(:im_link_type4) %></option>
 </select>
 <em><%= l(:im_link_type_desc) %></em><br />
 </p>
@@ -119,3 +130,112 @@
 <%= l(:im_settings_footer) %>
 <br>
 <%= l(:im_settings_wiki) %> <a href="https://github.com/MatthewPaulGithub/redmine_im_link/wiki" target=_blank>redmine_im_link Wiki</a>
+
+
+<script>
+
+function setfields(setname) {
+
+	if (setname == 'skype1') {
+		a = window.confirm('OVERWRITE Link1 with Skype Default settings?');
+		if (a == true) {
+			document.getElementById('settings_linkname').value='Skype';
+			document.getElementById('settings_linkurl').value='sip:%email%';
+			document.getElementsByName('settings[linktype]')[0].value='1';
+			document.getElementById('settings_includestring').value='@';
+			document.getElementById('settings_excludestring').value='';
+			document.getElementById('settings_linkcf').value='';
+			}
+	}
+	else if (setname == 'teams1') {
+		a = window.confirm('OVERWRITE Link1 with MSTeams Default settings?');
+		if (a == true) {
+			document.getElementById('settings_linkname').value='MSTeams';
+			document.getElementById('settings_linkurl').value='sip:%email%';
+			document.getElementsByName('settings[linktype]')[0].value='1';
+			document.getElementById('settings_includestring').value='@';
+			document.getElementById('settings_excludestring').value='';
+			document.getElementById('settings_linkcf').value='';
+			}
+	}
+	else if (setname == 'slack1') {
+		a = window.confirm('OVERWRITE Link1 with Slack Default settings?');
+		if (a == true) {
+			document.getElementById('settings_linkname').value='Slack';
+			document.getElementById('settings_linkurl').value='slack://channel?team=TEAMID&id=%cf%';
+			document.getElementsByName('settings[linktype]')[0].value='1';
+			document.getElementById('settings_includestring').value='@';
+			document.getElementById('settings_excludestring').value='';
+			document.getElementById('settings_linkcf').value='';
+			window.confirm('NOTE - To directly open correct user you must-\n1-Create User custom field like SlackID\n2-Populate the Slack UserID in that field\n3-Set that field in the Custom Field selection below\n4-Update the TEAMID value in the Link URL\nInstructions for getting the TeamID and UserID can be found in the Plugin Wiki (Link Below)');
+			}
+	}
+	else if (setname == 'email1') {
+		a = window.confirm('OVERWRITE Link1 with Email Default settings?');
+		if (a == true) {
+			document.getElementById('settings_linkname').value='Email';
+			document.getElementById('settings_linkurl').value='mailto:%email%?subject=%subject% [#%id%]';
+			document.getElementsByName('settings[linktype]')[0].value='1';
+			document.getElementById('settings_includestring').value='@';
+			document.getElementById('settings_excludestring').value='';
+			document.getElementById('settings_linkcf').value='';
+			}
+	}
+	else if (setname == 'skype2') {
+		a = window.confirm('OVERWRITE Link2 with Skype Default settings?');
+		if (a == true) {
+			document.getElementById('settings_linkname2').value='Skype';
+			document.getElementById('settings_linkurl2').value='sip:%email%';
+			document.getElementsByName('settings[linktype2]')[0].value='1';
+			document.getElementById('settings_includestring2').value='@';
+			document.getElementById('settings_excludestring2').value='';
+			document.getElementById('settings_linkcf2').value='';
+			}
+	}
+	else if (setname == 'teams2') {
+		a = window.confirm('OVERWRITE Link2 with MSTeams Default settings?');
+		if (a == true) {
+			document.getElementById('settings_linkname2').value='MSTeams';
+			document.getElementById('settings_linkurl2').value='sip:%email%';
+			document.getElementsByName('settings[linktype2]')[0].value='1';
+			document.getElementById('settings_includestring2').value='@';
+			document.getElementById('settings_excludestring2').value='';
+			document.getElementById('settings_linkcf2').value='';
+			}
+	}
+	else if (setname == 'slack2') {
+		a = window.confirm('OVERWRITE Link2 with Slack Default settings?');
+		if (a == true) {
+			document.getElementById('settings_linkname2').value='Slack';
+			document.getElementById('settings_linkurl2').value='slack://channel?team=TEAMID&id=%cf%';
+			document.getElementsByName('settings[linktype2]')[0].value='1';
+			document.getElementById('settings_includestring2').value='@';
+			document.getElementById('settings_excludestring2').value='';
+			document.getElementById('settings_linkcf2').value='';
+			window.confirm('NOTE - To directly open correct user you must-\n1-Create User custom field like SlackID\n2-Populate the Slack UserID in that field\n3-Set that field in the Custom Field selection below\n4-Update the TEAMID value in the Link URL\nInstructions for getting the TeamID and UserID can be found in the Plugin Wiki (Link Below)');
+			}
+	}
+	else if (setname == 'email2') {
+		a = window.confirm('OVERWRITE Link2 with Email Default settings?');
+		if (a == true) {
+			document.getElementById('settings_linkname2').value='Email';
+			document.getElementById('settings_linkurl2').value='mailto:%email%?subject=%subject% [#%id%]';
+			document.getElementsByName('settings[linktype2]')[0].value='1';
+			document.getElementById('settings_includestring2').value='@';
+			document.getElementById('settings_excludestring2').value='';
+			document.getElementById('settings_linkcf2').value='';
+			}
+	}
+	else if (setname == 'default1') {
+		a = window.confirm('OVERWRITE General with Default settings?');
+		if (a == true) {
+			document.getElementById('settings_addwatchers').checked=true;
+			document.getElementById('settings_showpeople').checked=false;
+			document.getElementById('settings_popupwindowsize').value='1100,600';
+			window.confirm('Remember to set the Roles and Permissions or no links will be shown!');
+			}
+	}
+		
+}
+
+</script>
