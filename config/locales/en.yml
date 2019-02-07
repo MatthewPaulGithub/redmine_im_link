@@ -1,7 +1,6 @@
 # English strings go here for Rails i18n
 en:
 
-  im_settings_legend0: 'Quick Setup Defaults'
   im_settings_legend1: 'General Settings'
   im_settings_legend2: 'Watcher Link 1'
   im_settings_legend3: 'Watcher Link 2'
@@ -25,10 +24,11 @@ en:
   im_link_url_desc: 'IM URI format, e.g. sip:%email% (%email% will be replaced)'
   
   im_link_type: 'Link Type'
-  im_link_type_desc: 'Open link in same, new, or popup window'
+  im_link_type_desc: 'Open link in same, new, popup, or pop/close window'
   im_link_type1: 'Default Link'
   im_link_type2: 'New Window/Tab'
   im_link_type3: 'Popup Window'
+  im_link_type4: 'Pop/Close Window'
   
   im_include: 'Include Strings (Comma Separated)'
   im_include_desc: 'Include domains/emails, e.g. yourdomain.com,vendor.com - use @ for ALL'
