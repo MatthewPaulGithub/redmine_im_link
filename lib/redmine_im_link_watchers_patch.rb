@@ -6,7 +6,7 @@ module RedmineImLinkWatchersPatch
 			base.class_eval do
 				unloadable
 				
-				def dostring(user,issue,cf,p1)
+				def dostring(user,issue,cf,p1,options={})
 					p1 = p1.gsub('%email%',user.mail)
 					p1 = p1.gsub('%firstname%',user.firstname)
 					p1 = p1.gsub('%lastname%',user.lastname)
@@ -17,6 +17,19 @@ module RedmineImLinkWatchersPatch
 					end
 					p1 = p1.gsub('%id%',issue.id.to_s)
 					p1 = p1.gsub('%cf%',cf)
+					p1 = p1.gsub('%watcherlist%',options[:watcherlist]) unless options[:watcherlist].nil?
+					p1 = p1.gsub('%meetingtopic%',options[:meetingtopic]) unless options[:meetingtopic].nil?
+					p1 = p1.gsub('%meetinginitmessage%',options[:meetinginitmessage]) unless options[:meetinginitmessage].nil?
+					p1.scan(/%cf_(\d+)%/).flatten.each { |id|
+						cf_value = issue.custom_field_value(id.to_i) || ""
+						p1 = p1.gsub("%cf_#{id}%",cf_value)
+					}
+					p1.scan(/%cf_\[(\d+)\]%/).flatten.each { |id|
+						cf_value = issue.custom_field_value(id.to_i)
+						enum_value = CustomFieldEnumeration.find_by_id(cf_value).to_s unless cf_value.nil?
+						enum_value ||= ""
+						p1 = p1.gsub("%cf_[#{id}]%",enum_value)
+					}
 					return p1
 				end
 				
@@ -124,6 +137,35 @@ module RedmineImLinkWatchersPatch
 					s
 				end
 
+				def buildmeetinglink(watcher_email_list,issue)
+					s = ''.html_safe
+
+					## Currently support MSTeams only
+					p_name = Setting.plugin_redmine_im_link['meetinglinkname'].to_s
+					p_url = Setting.plugin_redmine_im_link['meetingurl'].to_s
+					p_topic = dostring(User.current,issue,'',Setting.plugin_redmine_im_link['meetingtopic'].to_s)
+					p_message = dostring(User.current,issue,'',Setting.plugin_redmine_im_link['meetinginitmessage'].to_s)
+					p_watchers = watcher_email_list.join(",")
+
+					linkurl = dostring(User.current,issue,'',p_url,{:watcherlist=>p_watchers,:meetingtopic=>p_topic,:meetinginitmessage=>p_message})
+					linkurl = URI.escape(linkurl)
+					p_type = Setting.plugin_redmine_im_link['meetinglinktype'].to_s
+					case p_type
+					when '2'
+						s << link_to(p_name,linkurl,:target => "_blank")
+					when '3'
+						popupwindowsize = Setting.plugin_redmine_im_link['popupwindowsize'].to_s
+						popupwindowsize = '1100,600' unless popupwindowsize.include? ','
+						s << ('<a href="javascript:void(0)" onclick="OpenPopup(' + "'" + linkurl + "'," + popupwindowsize + ")" + '">' + p_name + '</a>').html_safe
+					when '4'
+						popupwindowsize = '1100,600'
+						s << ('<a href="javascript:void(0)" onclick="OpenPopClose(' + "'" + linkurl + "'," + popupwindowsize + ")" + '">' + p_name + '</a>').html_safe
+					else
+						s << link_to(p_name,linkurl)
+					end
+					s
+				end
+
 				# alias_method_chain :watchers_list, :im_link   -- was this for 3
 				alias_method :watchers_list, :watchers_list_with_im_link
 				
@@ -135,8 +177,25 @@ module RedmineImLinkWatchersPatch
 			def watchers_list_with_im_link(object)
 			remove_allowed = User.current.allowed_to?("delete_#{object.class.name.underscore}_watchers".to_sym, object.project)
 			content = ''.html_safe
+			watcher_email_list = []
+			show_meeting_link = Setting.plugin_redmine_im_link['meetinglinkname'].to_s.eql?('') ? false : true
+			show_meeting_link &= Setting.plugin_redmine_im_link['meetingurl'].to_s.eql?('') ? false : true
+			show_meeting_link &= object.is_a?(Issue)
+			if show_meeting_link
+				p_inc = Setting.plugin_redmine_im_link['meetinginclude'].to_s
+				p_exc = Setting.plugin_redmine_im_link['meetingexclude'].to_s
+				inc = p_inc.split(/[,\s]+/)
+				exc = p_exc.split(/[,\s]+/)
+			end
 			
 			lis = object.watcher_users.preload(:email_address).collect do |user|
+				if show_meeting_link
+					foundinc = inc.any?{|s| user.mail.downcase.include?(s.downcase)}
+					foundexc = exc.any?{|s| user.mail.downcase.include?(s.downcase)}
+					if (foundinc and not foundexc) or (p_url.include? '%cf%')
+						watcher_email_list << user.mail.to_s
+					end
+				end
 				s = ''.html_safe
 				s << avatar(user, :size => "16").to_s
 				if User.current.allowed_to?(:view_im_links, @project, :global => true)
@@ -213,7 +272,14 @@ module RedmineImLinkWatchersPatch
 					end
 				end
 			end
-			
+
+			# Meeting link
+			if show_meeting_link and !watcher_email_list.empty?
+				content << ('<h3>'+l(:im_meeting)+'</h3>').html_safe
+				content << image_tag('icons8-microsoft-teams-2019-48.png', :plugin => 'redmine_im_link')
+				content << buildmeetinglink(watcher_email_list,object)
+			end
+
 			#footer
 			if User.current.allowed_to?(:view_im_link_footer, @project, :global => true)
 				footerhtml = Setting.plugin_redmine_im_link['footerhtml'].to_s

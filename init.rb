@@ -35,8 +35,15 @@
   :linkcf2 => '',
   :linkurl2 => 'slack://open',
   :linktype2 => '1',
-  :includestring2 => 'mpaul@cityassets.com',
-  :excludestring2 => 'Include All'
+  :includestring2 => 'domain1',
+  :excludestring2 => 'email1@domain2.com',
+  :meetinglinkname => 'Meet now',
+  :meetingurl => '',
+  :meetingtopic => '',
+  :meetinginitmessage => '',
+  :meetinglinktype => '1',
+  :meetinginclude => 'domain1.com',
+  :meetingexclude => 'email1@domain2.com'
   }, 
   :partial => 'redmine_im_link/settings'
   

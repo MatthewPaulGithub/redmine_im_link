@@ -5,6 +5,7 @@ en:
   im_settings_legend2: 'Watcher User Link'
   im_settings_legend3: 'Watcher Link 1'
   im_settings_legend4: 'Watcher Link 2'
+  im_settings_legend5: 'Meeting Link'
   
   im_enable_autowatch: 'Enable Autowatch'
   im_enable_autowatch_desc: 'Automatic addition of Authors, Assignees, and Updating users as Watchers (Normally Checked)'
@@ -40,9 +41,19 @@ en:
   im_link_cf: 'User Custom Field (optional)'
   im_link_cf_desc: 'If selected will look for a value here first and enable use of %cf%'
 
+  im_meeting_link_url_desc: "Link to start meeting. Depends on IM's capability. You can use %meetingtopic% and %meetinginitmessage% to append correspond value in the link."
+
+  im_meeting_topic: 'Meeting Topic'
+  im_meeting_topic_desc: 'Topic for meeting. Will replace %meetingtopic% in Link URL'
+
+  im_meeting_initial_massage: 'Initial Message'
+  im_meeting_initial_massage_desc: 'Initial message for starting meeting. Will replace %meetinginitmessage% in Link URL'
+
   im_settings_footer: 'You can use any of the following in the URL - %email%, %firstname%, %lastname%, %username%, %firstinitial%, %cf%, %subject%, %id%'
+  im_settings_footer1: "You can also use issue's custom fields in the URL - %cf_id% (replace id with actual number, %cf_10% for example), %cf_[id]% (for Enumeration type of custom fields)"
   im_settings_wiki: 'For full documentation go to '
   
   im_people: 'Author/Assignee'
   im_author: 'Author'
-  
+
+  im_meeting: 'Meeting'
