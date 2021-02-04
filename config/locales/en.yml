@@ -2,8 +2,9 @@
 en:
 
   im_settings_legend1: 'General Settings'
-  im_settings_legend2: 'Watcher Link 1'
-  im_settings_legend3: 'Watcher Link 2'
+  im_settings_legend2: 'Watcher User Link'
+  im_settings_legend3: 'Watcher Link 1'
+  im_settings_legend4: 'Watcher Link 2'
   
   im_enable_autowatch: 'Enable Autowatch'
   im_enable_autowatch_desc: 'Automatic addition of Authors, Assignees, and Updating users as Watchers (Normally Checked)'

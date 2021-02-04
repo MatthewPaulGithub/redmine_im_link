@@ -27,7 +27,7 @@ module RedmineImLinkWatchersPatch
 					p_exc = Setting.plugin_redmine_im_link[p4].to_s
 					retstring = nil
 
-					if p_name.nil?
+					if p_name.nil? || p_name.empty? || p_url.nil? || p_url.empty?
 						return nil
 					end
 					
@@ -52,12 +52,38 @@ module RedmineImLinkWatchersPatch
 					retstring
 				end
 				
+				def buildlink0(user,issue)
+					if user.is_a?(User)
+					  name = h(user.name)
+					  if user.active? || (User.current.admin? && user.logged?)
+						s = ''.html_safe
+						linkurl0 = build_im_link(user,issue,'linkname0','linkurl0','includestring0','excludestring0','linkcf0')
+						if linkurl0.nil?
+							s << link_to_user(user)
+						else
+							p_type = Setting.plugin_redmine_im_link['linktype0'].to_s
+							case p_type
+							when '2'
+								s << link_to(name,linkurl0,:target => "_blank",:class => user.css_classes)
+							else
+								s << link_to(name,linkurl0,:class => user.css_classes)
+							end
+						end
+						s
+					  else
+						name
+					  end
+					else
+					  h(user.to_s)
+					end
+				end
+				
 				def buildlink1(user,issue,s)
-					linkname1 = Setting.plugin_redmine_im_link['linkname']
-					linkurl1 = build_im_link(user,issue,'linkname','linkurl','includestring','excludestring','linkcf')
+					linkname1 = Setting.plugin_redmine_im_link['linkname1']
+					linkurl1 = build_im_link(user,issue,'linkname1','linkurl1','includestring1','excludestring1','linkcf1')
 					if !linkurl1.nil? 
 						s << ' '
-						p_type = Setting.plugin_redmine_im_link['linktype'].to_s
+						p_type = Setting.plugin_redmine_im_link['linktype1'].to_s
 						case p_type
 						when '2'
 							s << link_to(linkname1,linkurl1,:target => "_blank")
@@ -113,7 +139,11 @@ module RedmineImLinkWatchersPatch
 			lis = object.watcher_users.preload(:email_address).collect do |user|
 				s = ''.html_safe
 				s << avatar(user, :size => "16").to_s
-				s << link_to_user(user, :class => 'user')
+				if User.current.allowed_to?(:view_im_links, @project, :global => true)
+					s << buildlink0(user,object)
+				else
+					s << link_to_user(user, :class => 'user')
+				end
 
 				# add in rm version for correct display of delete button
 				if remove_allowed
@@ -155,28 +185,31 @@ module RedmineImLinkWatchersPatch
 					  content << ('<h3>'+l(:im_author)+'</h3>').html_safe
 					end
 					# author
-					content << avatar(object.author, :size => "16").to_s
-					content << link_to_user(object.author, :class => 'user')
-					content << ' '
-					content << image_tag('author.png', :plugin => 'redmine_im_link')
+					s = ''.html_safe
+					s << avatar(object.author, :size => "16").to_s
+					s << buildlink0(object.author,object)
+					s << ' '
+					s << image_tag('author.png', :plugin => 'redmine_im_link', :class => 'delete')
 					if User.current.allowed_to?(:view_im_links, @project, :global => true)
-						content = buildlink1(object.author,object,content)
-						content = buildlink2(object.author,object,content)
+						s = buildlink1(object.author,object,s)
+						s = buildlink2(object.author,object,s)
 					end
+					content << content_tag('li', s, :class => "user-#{object.author.id}")
 				end
 			
 				# assignee
 				if object.respond_to?(:assigned_to)
 					unless object.assigned_to.nil? || object.assigned_to.type != 'User'
-						content << '<br>'.html_safe
-						content << avatar(object.assigned_to, :size => "16").to_s
-						content << link_to_user(object.assigned_to, :class => 'user')
-						content << ' '
-						content << image_tag('assignee.png', :plugin => 'redmine_im_link')
+						s = ''.html_safe
+						s << avatar(object.assigned_to, :size => "16").to_s
+						s << buildlink0(object.assigned_to,object)
+						s << ' '
+						s << image_tag('assignee.png', :plugin => 'redmine_im_link', :class => 'delete')
 						if User.current.allowed_to?(:view_im_links, @project, :global => true)
-							content = buildlink1(object.assigned_to,object,content)
-							content = buildlink2(object.assigned_to,object,content)
+							s = buildlink1(object.assigned_to,object,s)
+							s = buildlink2(object.assigned_to,object,s)
 						end
+						content << content_tag('li', s, :class => "user-#{object.assigned_to.id}")
 					end
 				end
 			end
@@ -191,7 +224,6 @@ module RedmineImLinkWatchersPatch
 			end
 			
 		    content.present? ? content_tag('ul', content, :class => 'watchers') : content
-
 		end
     end
 
