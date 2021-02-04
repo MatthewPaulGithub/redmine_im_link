@@ -14,6 +14,8 @@ Adds a link after a watcher name to directly call skype or slack or ms teams etc
 
 * Ability to add TWO links after each user name on the watcher list
 
+* Ability to override user link on the watcher list
+
 * Ability to define the links dynamically by using a mask and then including certain domains and excluding specific email addresses
 
 * Ability to select a custom field for each link if the mask method does not suffice or is irregular
@@ -22,7 +24,11 @@ Adds a link after a watcher name to directly call skype or slack or ms teams etc
 
 * Ability to substitute user info on the URL mask like %email%, %firstinitial%, %lastname% etc.
 
+* Ability to substitute issue info on the URL mask like %cf_id%, %cf_[id]%, with id replaced by actual number for custom field.
+
 * Ability to set permissions so certain users can see links, others cannot
+
+* Ability to add a link to start meeting (currently support MSTeams only)
 
 == Getting the Plugin
 
@@ -40,7 +46,7 @@ Always here at Github
 
 == Usage
 
-Users will see links dynamically created after each watcher - they can click these to open the natice skype, slack, etc apps
+Users will see links dynamically created after each watcher - they can click these to open the native skype, MSTeams, slack, etc apps
 
 == Acknowledgments
 
