@@ -6,15 +6,30 @@ module RedmineImLinkWatchersPatch
 			base.class_eval do
 				unloadable
 				
-				def dostring(user,issue,cf,p1)
+				def dostring(user,issue,cf,p1,options={})
 					p1 = p1.gsub('%email%',user.mail)
 					p1 = p1.gsub('%firstname%',user.firstname)
 					p1 = p1.gsub('%lastname%',user.lastname)
 					p1 = p1.gsub('%username%',user.login)
 					p1 = p1.gsub('%firstinitial%',user.firstname.chr)
-					p1 = p1.gsub('%subject%',issue.subject)
+					if issue.respond_to?(:subject)
+						p1 = p1.gsub('%subject%',issue.subject)
+					end
 					p1 = p1.gsub('%id%',issue.id.to_s)
 					p1 = p1.gsub('%cf%',cf)
+					p1 = p1.gsub('%watcherlist%',options[:watcherlist]) unless options[:watcherlist].nil?
+					p1 = p1.gsub('%meetingtopic%',options[:meetingtopic]) unless options[:meetingtopic].nil?
+					p1 = p1.gsub('%meetinginitmessage%',options[:meetinginitmessage]) unless options[:meetinginitmessage].nil?
+					p1.scan(/%cf_(\d+)%/).flatten.each { |id|
+						cf_value = issue.custom_field_value(id.to_i) || ""
+						p1 = p1.gsub("%cf_#{id}%",cf_value)
+					}
+					p1.scan(/%cf_\[(\d+)\]%/).flatten.each { |id|
+						cf_value = issue.custom_field_value(id.to_i)
+						enum_value = CustomFieldEnumeration.find_by_id(cf_value).to_s unless cf_value.nil?
+						enum_value ||= ""
+						p1 = p1.gsub("%cf_[#{id}]%",enum_value)
+					}
 					return p1
 				end
 				
@@ -25,7 +40,7 @@ module RedmineImLinkWatchersPatch
 					p_exc = Setting.plugin_redmine_im_link[p4].to_s
 					retstring = nil
 
-					if p_name.nil?
+					if p_name.nil? || p_name.empty? || p_url.nil? || p_url.empty?
 						return nil
 					end
 					
@@ -50,12 +65,38 @@ module RedmineImLinkWatchersPatch
 					retstring
 				end
 				
+				def buildlink0(user,issue)
+					if user.is_a?(User)
+					  name = h(user.name)
+					  if user.active? || (User.current.admin? && user.logged?)
+						s = ''.html_safe
+						linkurl0 = build_im_link(user,issue,'linkname0','linkurl0','includestring0','excludestring0','linkcf0')
+						if linkurl0.nil?
+							s << link_to_user(user)
+						else
+							p_type = Setting.plugin_redmine_im_link['linktype0'].to_s
+							case p_type
+							when '2'
+								s << link_to(name,linkurl0,:target => "_blank",:class => user.css_classes)
+							else
+								s << link_to(name,linkurl0,:class => user.css_classes)
+							end
+						end
+						s
+					  else
+						name
+					  end
+					else
+					  h(user.to_s)
+					end
+				end
+				
 				def buildlink1(user,issue,s)
-					linkname1 = Setting.plugin_redmine_im_link['linkname']
-					linkurl1 = build_im_link(user,issue,'linkname','linkurl','includestring','excludestring','linkcf')
+					linkname1 = Setting.plugin_redmine_im_link['linkname1']
+					linkurl1 = build_im_link(user,issue,'linkname1','linkurl1','includestring1','excludestring1','linkcf1')
 					if !linkurl1.nil? 
 						s << ' '
-						p_type = Setting.plugin_redmine_im_link['linktype'].to_s
+						p_type = Setting.plugin_redmine_im_link['linktype1'].to_s
 						case p_type
 						when '2'
 							s << link_to(linkname1,linkurl1,:target => "_blank")
@@ -96,6 +137,35 @@ module RedmineImLinkWatchersPatch
 					s
 				end
 
+				def buildmeetinglink(watcher_email_list,issue)
+					s = ''.html_safe
+
+					## Currently support MSTeams only
+					p_name = Setting.plugin_redmine_im_link['meetinglinkname'].to_s
+					p_url = Setting.plugin_redmine_im_link['meetingurl'].to_s
+					p_topic = dostring(User.current,issue,'',Setting.plugin_redmine_im_link['meetingtopic'].to_s)
+					p_message = dostring(User.current,issue,'',Setting.plugin_redmine_im_link['meetinginitmessage'].to_s)
+					p_watchers = watcher_email_list.join(",")
+
+					linkurl = dostring(User.current,issue,'',p_url,{:watcherlist=>p_watchers,:meetingtopic=>p_topic,:meetinginitmessage=>p_message})
+					linkurl = URI.escape(linkurl)
+					p_type = Setting.plugin_redmine_im_link['meetinglinktype'].to_s
+					case p_type
+					when '2'
+						s << link_to(p_name,linkurl,:target => "_blank")
+					when '3'
+						popupwindowsize = Setting.plugin_redmine_im_link['popupwindowsize'].to_s
+						popupwindowsize = '1100,600' unless popupwindowsize.include? ','
+						s << ('<a href="javascript:void(0)" onclick="OpenPopup(' + "'" + linkurl + "'," + popupwindowsize + ")" + '">' + p_name + '</a>').html_safe
+					when '4'
+						popupwindowsize = '1100,600'
+						s << ('<a href="javascript:void(0)" onclick="OpenPopClose(' + "'" + linkurl + "'," + popupwindowsize + ")" + '">' + p_name + '</a>').html_safe
+					else
+						s << link_to(p_name,linkurl)
+					end
+					s
+				end
+
 				# alias_method_chain :watchers_list, :im_link   -- was this for 3
 				alias_method :watchers_list, :watchers_list_with_im_link
 				
@@ -107,11 +177,32 @@ module RedmineImLinkWatchersPatch
 			def watchers_list_with_im_link(object)
 			remove_allowed = User.current.allowed_to?("delete_#{object.class.name.underscore}_watchers".to_sym, object.project)
 			content = ''.html_safe
+			watcher_email_list = []
+			show_meeting_link = Setting.plugin_redmine_im_link['meetinglinkname'].to_s.eql?('') ? false : true
+			show_meeting_link &= Setting.plugin_redmine_im_link['meetingurl'].to_s.eql?('') ? false : true
+			show_meeting_link &= object.is_a?(Issue)
+			if show_meeting_link
+				p_inc = Setting.plugin_redmine_im_link['meetinginclude'].to_s
+				p_exc = Setting.plugin_redmine_im_link['meetingexclude'].to_s
+				inc = p_inc.split(/[,\s]+/)
+				exc = p_exc.split(/[,\s]+/)
+			end
 			
 			lis = object.watcher_users.preload(:email_address).collect do |user|
+				if show_meeting_link
+					foundinc = inc.any?{|s| user.mail.downcase.include?(s.downcase)}
+					foundexc = exc.any?{|s| user.mail.downcase.include?(s.downcase)}
+					if (foundinc and not foundexc) or (p_url.include? '%cf%')
+						watcher_email_list << user.mail.to_s
+					end
+				end
 				s = ''.html_safe
 				s << avatar(user, :size => "16").to_s
-				s << link_to_user(user, :class => 'user')
+				if User.current.allowed_to?(:view_im_links, @project, :global => true)
+					s << buildlink0(user,object)
+				else
+					s << link_to_user(user, :class => 'user')
+				end
 
 				# add in rm version for correct display of delete button
 				if remove_allowed
@@ -146,31 +237,49 @@ module RedmineImLinkWatchersPatch
 			# add in author/assignee if required
 			showpeople = Setting.plugin_redmine_im_link['showpeople'].to_s.eql?('true') ? true : false
 			if showpeople
-				content << ('<h3>'+l(:im_people)+'</h3>').html_safe
-				# author
-				content << avatar(object.author, :size => "16").to_s
-				content << link_to_user(object.author, :class => 'user')
-				content << ' '
-				content << image_tag('author.png', :plugin => 'redmine_im_link')
-				if User.current.allowed_to?(:view_im_links, @project, :global => true)
-					content = buildlink1(object.author,object,content)
-					content = buildlink2(object.author,object,content)
+				if object.respond_to?(:author)
+					if object.respond_to?(:assigned_to)
+					  content << ('<h3>'+l(:im_people)+'</h3>').html_safe
+					else
+					  content << ('<h3>'+l(:im_author)+'</h3>').html_safe
+					end
+					# author
+					s = ''.html_safe
+					s << avatar(object.author, :size => "16").to_s
+					s << buildlink0(object.author,object)
+					s << ' '
+					s << image_tag('author.png', :plugin => 'redmine_im_link', :class => 'delete')
+					if User.current.allowed_to?(:view_im_links, @project, :global => true)
+						s = buildlink1(object.author,object,s)
+						s = buildlink2(object.author,object,s)
+					end
+					content << content_tag('li', s, :class => "user-#{object.author.id}")
 				end
 			
 				# assignee
-				unless object.assigned_to.nil? || object.assigned_to.type != 'User'
-					content << '<br>'.html_safe
-					content << avatar(object.assigned_to, :size => "16").to_s
-					content << link_to_user(object.assigned_to, :class => 'user')
-					content << ' '
-					content << image_tag('assignee.png', :plugin => 'redmine_im_link')
-					if User.current.allowed_to?(:view_im_links, @project, :global => true)
-						content = buildlink1(object.assigned_to,object,content)
-						content = buildlink2(object.assigned_to,object,content)
+				if object.respond_to?(:assigned_to)
+					unless object.assigned_to.nil? || object.assigned_to.type != 'User'
+						s = ''.html_safe
+						s << avatar(object.assigned_to, :size => "16").to_s
+						s << buildlink0(object.assigned_to,object)
+						s << ' '
+						s << image_tag('assignee.png', :plugin => 'redmine_im_link', :class => 'delete')
+						if User.current.allowed_to?(:view_im_links, @project, :global => true)
+							s = buildlink1(object.assigned_to,object,s)
+							s = buildlink2(object.assigned_to,object,s)
+						end
+						content << content_tag('li', s, :class => "user-#{object.assigned_to.id}")
 					end
 				end
 			end
-			
+
+			# Meeting link
+			if show_meeting_link and !watcher_email_list.empty?
+				content << ('<h3>'+l(:im_meeting)+'</h3>').html_safe
+				content << image_tag('icons8-microsoft-teams-2019-48.png', :plugin => 'redmine_im_link')
+				content << buildmeetinglink(watcher_email_list,object)
+			end
+
 			#footer
 			if User.current.allowed_to?(:view_im_link_footer, @project, :global => true)
 				footerhtml = Setting.plugin_redmine_im_link['footerhtml'].to_s
@@ -181,7 +290,6 @@ module RedmineImLinkWatchersPatch
 			end
 			
 		    content.present? ? content_tag('ul', content, :class => 'watchers') : content
-
 		end
     end
 
