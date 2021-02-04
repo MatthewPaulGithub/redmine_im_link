@@ -12,7 +12,9 @@ module RedmineImLinkWatchersPatch
 					p1 = p1.gsub('%lastname%',user.lastname)
 					p1 = p1.gsub('%username%',user.login)
 					p1 = p1.gsub('%firstinitial%',user.firstname.chr)
-					p1 = p1.gsub('%subject%',issue.subject)
+					if issue.respond_to?(:subject)
+						p1 = p1.gsub('%subject%',issue.subject)
+					end
 					p1 = p1.gsub('%id%',issue.id.to_s)
 					p1 = p1.gsub('%cf%',cf)
 					return p1
@@ -146,27 +148,35 @@ module RedmineImLinkWatchersPatch
 			# add in author/assignee if required
 			showpeople = Setting.plugin_redmine_im_link['showpeople'].to_s.eql?('true') ? true : false
 			if showpeople
-				content << ('<h3>'+l(:im_people)+'</h3>').html_safe
-				# author
-				content << avatar(object.author, :size => "16").to_s
-				content << link_to_user(object.author, :class => 'user')
-				content << ' '
-				content << image_tag('author.png', :plugin => 'redmine_im_link')
-				if User.current.allowed_to?(:view_im_links, @project, :global => true)
-					content = buildlink1(object.author,object,content)
-					content = buildlink2(object.author,object,content)
+				if object.respond_to?(:author)
+					if object.respond_to?(:assigned_to)
+					  content << ('<h3>'+l(:im_people)+'</h3>').html_safe
+					else
+					  content << ('<h3>'+l(:im_author)+'</h3>').html_safe
+					end
+					# author
+					content << avatar(object.author, :size => "16").to_s
+					content << link_to_user(object.author, :class => 'user')
+					content << ' '
+					content << image_tag('author.png', :plugin => 'redmine_im_link')
+					if User.current.allowed_to?(:view_im_links, @project, :global => true)
+						content = buildlink1(object.author,object,content)
+						content = buildlink2(object.author,object,content)
+					end
 				end
 			
 				# assignee
-				unless object.assigned_to.nil? || object.assigned_to.type != 'User'
-					content << '<br>'.html_safe
-					content << avatar(object.assigned_to, :size => "16").to_s
-					content << link_to_user(object.assigned_to, :class => 'user')
-					content << ' '
-					content << image_tag('assignee.png', :plugin => 'redmine_im_link')
-					if User.current.allowed_to?(:view_im_links, @project, :global => true)
-						content = buildlink1(object.assigned_to,object,content)
-						content = buildlink2(object.assigned_to,object,content)
+				if object.respond_to?(:assigned_to)
+					unless object.assigned_to.nil? || object.assigned_to.type != 'User'
+						content << '<br>'.html_safe
+						content << avatar(object.assigned_to, :size => "16").to_s
+						content << link_to_user(object.assigned_to, :class => 'user')
+						content << ' '
+						content << image_tag('assignee.png', :plugin => 'redmine_im_link')
+						if User.current.allowed_to?(:view_im_links, @project, :global => true)
+							content = buildlink1(object.assigned_to,object,content)
+							content = buildlink2(object.assigned_to,object,content)
+						end
 					end
 				end
 			end
